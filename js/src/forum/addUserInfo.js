@@ -52,18 +52,17 @@ export default function () {
     const user = this.attrs.user;
     const profile_node = findMatchClass(vnode, 'UserCard-profile')[0];
     const amt = Number(setting('rankAmt'));
-    const user_ranks = user.ranks() ? user.ranks() : [];
 
     if (!profile_node) return;
 
     let badges_node = profile_node.children.find(matchClass('UserCard-badges'));
-    if (user_ranks) {
+    if (user.ranks()) {
       if (!badges_node) {
         profile_node.children.splice(
           1,
           0,
           <ul className="UserCard-badges badges">
-            {user_ranks
+            {(user.ranks() || [])
               .reverse()
               .map((rank, i) => {
                 if (!amt || i < amt) {
@@ -73,7 +72,7 @@ export default function () {
           </ul>
         );
       } else {
-        user_ranks
+        (user.ranks() || [])
           .reverse()
           .map((rank, i) => {
             if (!amt || i < amt) {
@@ -95,18 +94,16 @@ export default function () {
   extend(PostUser.prototype, 'view', function (vnode) {
     const post = this.attrs.post;
     const user = post.user();
-    const user_ranks = user.ranks() ? user.ranks() : [];
-
     if (!user) {
       return vnode;
     }
 
     const header_node = vnode.children.find(matchTag('h3'));
-    const amt = Number(setting('rankAmt')) ?? user.ranks().length;
+    const amt = Number(setting('rankAmt')) ?? (user.ranks() || []).length;
       
     header_node.children = header_node.children
       .concat(
-        user_ranks
+        (user.ranks() || [])
           .reverse()
           .splice(0, amt)
           .map((rank) => {
