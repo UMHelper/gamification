@@ -103,11 +103,12 @@ export default function () {
 
     const header_node = vnode.children.find(matchTag('h3'));
     const amt = Number(setting('rankAmt')) ?? user.ranks().length;
-
+      
+    var user_ranks = user.ranks() ? user.ranks() : [];
+      
     header_node.children = header_node.children
       .concat(
-        user
-          .ranks()
+        user_ranks
           .reverse()
           .splice(0, amt)
           .map((rank) => {
