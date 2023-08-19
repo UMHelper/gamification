@@ -4,6 +4,8 @@
 
 This fork fixes bugs when working with [clarkwinkelmann/flarum-ext-anonymous-posting](https://github.com/clarkwinkelmann/flarum-ext-anonymous-posting/issues/3).
 
+Change `[x].ranks()` to `([x].ranks() || [])` in `js/src/forum/addUserInfo.js` and `js/dist/forum.js` to avoid null array.
+
 ### Original Readme
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/fof/gamification.svg)](https://packagist.org/packages/fof/gamification) [![OpenCollective](https://img.shields.io/badge/opencollective-fof-blue.svg)](https://opencollective.com/fof/donate)  
