@@ -56,38 +56,35 @@ export default function () {
     if (!profile_node) return;
 
     let badges_node = profile_node.children.find(matchClass('UserCard-badges'));
-    if (user.ranks()) {
-      if (!badges_node) {
-        profile_node.children.splice(
-          1,
-          0,
-          <ul className="UserCard-badges badges">
-            {(user.ranks() || [])
-              .reverse()
-              .map((rank, i) => {
-                if (!amt || i < amt) {
-                  return <li className="User-Rank">{rankLabel(rank)}</li>;
-                }
-              })}
-          </ul>
-        );
-      } else {
-        (user.ranks() || [])
-          .reverse()
-          .map((rank, i) => {
-            if (!amt || i < amt) {
-              return <li className="User-Rank">{rankLabel(rank)}</li>;
-            }
-          })
-          .forEach((rank) => {
-            if (!rank) {
-              return;
-            }
-            badges_node.children.push(rank);
-          });
-      }
+    if (!badges_node) {
+      profile_node.children.splice(
+        1,
+        0,
+        <ul className="UserCard-badges badges">
+          {(user.ranks() || [])
+            .reverse()
+            .map((rank, i) => {
+              if (!amt || i < amt) {
+                return <li className="User-Rank">{rankLabel(rank)}</li>;
+              }
+            })}
+        </ul>
+      );
+    } else {
+      (user.ranks() || [])
+        .reverse()
+        .map((rank, i) => {
+          if (!amt || i < amt) {
+            return <li className="User-Rank">{rankLabel(rank)}</li>;
+          }
+        })
+        .forEach((rank) => {
+          if (!rank) {
+            return;
+          }
+          badges_node.children.push(rank);
+        });
     }
-
     return vnode;
   });
 
@@ -100,7 +97,7 @@ export default function () {
 
     const header_node = vnode.children.find(matchTag('h3'));
     const amt = Number(setting('rankAmt')) ?? (user.ranks() || []).length;
-      
+
     header_node.children = header_node.children
       .concat(
         (user.ranks() || [])
