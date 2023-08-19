@@ -14,6 +14,7 @@ namespace FoF\Gamification;
 use Flarum\Api\Controller;
 use Flarum\Api\Serializer;
 use Flarum\Discussion\Event\Started;
+use Flarum\Discussion\Filter\DiscussionFilterer;
 use Flarum\Discussion\Search\DiscussionSearcher;
 use Flarum\Extend;
 use Flarum\Post\Event\Deleted;
@@ -90,6 +91,7 @@ return [
         ->listen(Posted::class, Listeners\AddVoteHandler::class)
         ->listen(Deleted::class, Listeners\RemoveVoteHandler::class)
         ->listen(Started::class, Listeners\AddDiscussionVotes::class)
+        ->listen(Events\UserPointsUpdated::class, Listeners\UpdateAutoAssignedGroups::class)
         ->subscribe(Listeners\QueueJobs::class),
 
     (new Extend\ApiSerializer(Serializer\PostSerializer::class))
@@ -113,7 +115,10 @@ return [
         }),
 
     (new Extend\Settings())
+        ->default('fof-gamification.blockedUsers', '')
+        ->default('fof-gamification.rankAmt', 2)
         ->default('fof-gamification.firstPostOnly', false)
+        ->default('fof-gamification.allowSelfVotes', true)
         ->serializeToForum('fof-gamification.topimage1Url', 'fof-gamification.topimage1_path', function ($value) {
             return $value ? "/assets/$value" : null;
         })
@@ -126,11 +131,7 @@ return [
         ->serializeToForum('fof-gamification-op-votes-only', 'fof-gamification.firstPostOnly', 'boolVal'),
 
     (new Extend\ApiSerializer(Serializer\UserSerializer::class))
-        ->attributes(function (Serializer\UserSerializer $serializer, User $user, array $attributes) {
-            $attributes['points'] = $user->votes;
-
-            return $attributes;
-        }),
+        ->attributes(AddUserAttributes::class),
 
     (new Extend\ApiSerializer(Serializer\BasicDiscussionSerializer::class))
         ->attributes(AddDiscussionData::class),
@@ -189,6 +190,8 @@ return [
         ->addFilter(Search\HotFilterGambit::class),
 
     (new Extend\Console())
+        ->command(Console\ResyncUserVotes::class)
+        ->command(Console\AutoAssignGroups::class)
         ->command(Console\ResyncDiscussionVotes::class),
 
     (new Extend\View())

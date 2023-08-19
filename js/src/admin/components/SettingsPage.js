@@ -7,6 +7,7 @@ import withAttr from 'flarum/common/utils/withAttr';
 import Stream from 'flarum/common/utils/Stream';
 import ItemList from 'flarum/common/utils/ItemList';
 import UploadImageButton from './UploadImageButton';
+import GroupSettings from './GroupSettings';
 
 export default class SettingsPage extends ExtensionPage {
   oninit(vnode) {
@@ -21,6 +22,7 @@ export default class SettingsPage extends ExtensionPage {
       'iconName',
       'blockedUsers',
       'iconNameAlt',
+      'autoAssignedGroups',
     ];
 
     this.switches = [
@@ -32,6 +34,7 @@ export default class SettingsPage extends ExtensionPage {
       'altPostVotingUi',
       'upVotesOnly',
       'firstPostOnly',
+      'allowSelfVotes',
     ];
 
     this.ranks = app.store.all('ranks');
@@ -248,8 +251,9 @@ export default class SettingsPage extends ExtensionPage {
         <label>{app.translator.trans('fof-gamification.admin.page.ranks.number_title')}</label>
         <input
           className="FormControl Ranks-default"
-          value={this.values.rankAmt() || ''}
-          placeholder="2"
+          value={this.values.rankAmt()}
+          type="number"
+          min="0"
           oninput={withAttr('value', this.values.rankAmt)}
         />
       </fieldset>,
@@ -272,6 +276,16 @@ export default class SettingsPage extends ExtensionPage {
         {this.rankingsItems().toArray()}
       </>,
       70
+    );
+
+    items.add(
+      'groups',
+      <fieldset className="SettingsPage-groups">
+        <legend>{app.translator.trans('fof-gamification.admin.page.groups.title')}</legend>
+        <div className="helpText">{app.translator.trans('fof-gamification.admin.page.groups.help')}</div>
+        <GroupSettings value={this.values.autoAssignedGroups()} onchange={this.values.autoAssignedGroups} />
+      </fieldset>,
+      60
     );
 
     items.add(
@@ -372,6 +386,14 @@ export default class SettingsPage extends ExtensionPage {
         {app.translator.trans('fof-gamification.admin.page.votes.first_post_only')}
       </Switch>,
       20
+    );
+
+    items.add(
+      'allowSelfVotes',
+      <Switch state={this.values.allowSelfVotes()} onchange={this.values.allowSelfVotes} className="votes-switch">
+        {app.translator.trans('fof-gamification.admin.page.votes.allow_self_votes')}
+      </Switch>,
+      10
     );
 
     return items;
